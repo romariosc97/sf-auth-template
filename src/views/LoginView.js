@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import 'react-bulma-components/dist/react-bulma-components.min.css';
 import { Button, Form } from 'react-bulma-components';
 import { Redirect } from "react-router-dom";
 import axios from 'axios';
@@ -27,13 +26,13 @@ export default function LoginView() {
       setUsernameHelp('');
       setPasswordColor(null);
       setPasswordHelp('');
-      axios.post(
-        `http://localhost:8080/api/auth/login`, 
-        {username:username, password:password}, 
-        {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, Content_Type: 'application/json'}
-      )
+      const loginAxios = axios.create({
+        
+        //timeout: 10000,
+        withCredentials: true,
+      });
+      loginAxios.post(`http://localhost:8080/api/auth/login`, {username:username, password:password})
       .then(res => {
-        console.log(res);
         setRedirectLogin(<Redirect to="/dashboard" />);
       })
     } 
