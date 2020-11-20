@@ -1,13 +1,74 @@
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import 'react-bulma-components/dist/react-bulma-components.min.css';
-import { Button } from 'react-bulma-components';
+import { Button, Form } from 'react-bulma-components';
+import { Redirect } from "react-router-dom";
+import axios from 'axios';
+const { Input, Field, Control, Label, Help } = Form;
 
 export default function LoginView() {
-  
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [usernameColor, setUsernameColor] = useState(null);
+  const [passwordColor, setPasswordColor] = useState(null);
+  const [usernameHelp, setUsernameHelp] = useState('');
+  const [passwordHelp, setPasswordHelp] = useState('');
+  const [redirectLogin, setRedirectLogin] = useState('');
+  const login = () => {
+    if(username==''){
+      setUsernameColor('danger');
+      setUsernameHelp('No deje este campo en blanco.');
+    }
+    if(password==''){
+      setPasswordColor('danger');
+      setPasswordHelp('No deje este campo en blanco.');
+    }
+    if(username!='' && password!=''){
+      setUsernameColor(null);
+      setUsernameHelp('');
+      setPasswordColor(null);
+      setPasswordHelp('');
+      axios.post(
+        `http://localhost:8080/api/auth/login`, 
+        {username:username, password:password}, 
+        {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, Content_Type: 'application/json'}
+      )
+      .then(res => {
+        console.log(res);
+        setRedirectLogin(<Redirect to="/dashboard" />);
+      })
+    } 
+  };
   return (
     <section className="login">
-      <h5>Login</h5>
-      <Button color="primary">My Bulma button</Button>
+      <div className="columns is-mobile is-vcentered">
+        <div className="column is-half is-offset-one-quarter">
+          <div className="has-text-centered">
+            <h1 className="title">Authentication</h1>
+          </div>
+          <Field>
+            <Control>
+              <Label>Name</Label>
+              <Input color={usernameColor} type="text" value={username} name="username" onChange={(e) => {
+                setUsername(e.target.value);
+              }} />
+              <Help color="danger">{usernameHelp}</Help>
+            </Control>
+          </Field>
+          <Field>
+            <Control>
+              <Label>Password</Label>
+              <Input color={passwordColor} type="password" value={password} name="password" onChange={(e) => {
+                setPassword(e.target.value);
+              }} />
+              <Help color="danger">{passwordHelp}</Help>
+            </Control>
+          </Field>
+          <Button.Group className="is-centered">
+            <Button onClick={login} color="primary">LOGIN</Button>
+          </Button.Group>
+          {redirectLogin}
+        </div>
+      </div>
     </section>
     
   )
