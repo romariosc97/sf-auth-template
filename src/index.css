@@ -11,7 +11,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
+section.login{
+  background-color:#fbf6f0;
+}
 section.login .is-vcentered{
   height:100vh;
+}
+.mb-4{
+  margin-bottom: 1rem;
+}
+.my-4{
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+section.dashboard{
+  padding-top: 2rem;
+  min-height: 700px;
+  background-color: #fbf6f0;
 }

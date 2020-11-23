@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Button, Form } from 'react-bulma-components';
+import { Button, Form, Card } from 'react-bulma-components';
 import { Redirect } from "react-router-dom";
 import axios from 'axios';
 const { Input, Field, Control, Label, Help } = Form;
@@ -12,6 +12,7 @@ export default function LoginView() {
   const [usernameHelp, setUsernameHelp] = useState('');
   const [passwordHelp, setPasswordHelp] = useState('');
   const [redirectLogin, setRedirectLogin] = useState('');
+  const [loginBtnStatus, setLoginBtnStatus] = useState(false);
   const login = () => {
     if(username==''){
       setUsernameColor('danger');
@@ -22,6 +23,7 @@ export default function LoginView() {
       setPasswordHelp('No deje este campo en blanco.');
     }
     if(username!='' && password!=''){
+      setLoginBtnStatus(true);
       setUsernameColor(null);
       setUsernameHelp('');
       setPasswordColor(null);
@@ -35,37 +37,50 @@ export default function LoginView() {
       .then(res => {
         setRedirectLogin(<Redirect to="/dashboard" />);
       })
+      .finally(() => {
+        setLoginBtnStatus(false);
+      })
     } 
   };
   return (
     <section className="login">
       <div className="columns is-mobile is-vcentered">
-        <div className="column is-half is-offset-one-quarter">
-          <div className="has-text-centered">
-            <h1 className="title">Authentication</h1>
-          </div>
-          <Field>
-            <Control>
-              <Label>Name</Label>
-              <Input color={usernameColor} type="text" value={username} name="username" onChange={(e) => {
-                setUsername(e.target.value);
-              }} />
-              <Help color="danger">{usernameHelp}</Help>
-            </Control>
-          </Field>
-          <Field>
-            <Control>
-              <Label>Password</Label>
-              <Input color={passwordColor} type="password" value={password} name="password" onChange={(e) => {
-                setPassword(e.target.value);
-              }} />
-              <Help color="danger">{passwordHelp}</Help>
-            </Control>
-          </Field>
-          <Button.Group className="is-centered">
-            <Button onClick={login} color="primary">LOGIN</Button>
-          </Button.Group>
-          {redirectLogin}
+        <div className="column is-4 is-offset-4">
+        <Card>
+            <Card.Content>
+              <div className="column is-10 is-offset-1 my-4">
+                <div className="has-text-centered">
+                  <div>
+                    <img src="https://seeklogo.com/images/B/bulma-logo-45B5145BF4-seeklogo.com.png" width="30"/>
+                  </div>
+                  <h2 className="title mb-4">Authentication</h2>
+                </div>
+                <Field>
+                  <Control>
+                    <Label>Email</Label>
+                    <Input color={usernameColor} type="text" value={username} name="username" onChange={(e) => {
+                      setUsername(e.target.value);
+                    }} />
+                    <Help color="danger">{usernameHelp}</Help>
+                  </Control>
+                </Field>
+                <Field>
+                  <Control>
+                    <Label>Password</Label>
+                    <Input color={passwordColor} type="password" value={password} name="password" onChange={(e) => {
+                      setPassword(e.target.value);
+                    }} />
+                    <Help color="danger">{passwordHelp}</Help>
+                  </Control>
+                </Field>
+                <Button.Group className="is-centered">
+                  <Button loading={loginBtnStatus} disabled={loginBtnStatus} onClick={login} color="primary">LOGIN</Button>
+                </Button.Group>
+                {redirectLogin}
+              </div>
+            </Card.Content>
+          </Card>
+          
         </div>
       </div>
     </section>
