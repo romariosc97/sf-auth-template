@@ -32,7 +32,7 @@ section.dashboard{
 section.dashboard .card{
   min-height: 450px;
 }
-.my-spinner-c{
+.my-spinner-c, .position-relative{
   position:relative;
 }
 .my-spinner:after {
@@ -55,4 +55,11 @@ section.dashboard .card{
 }
 .table-actions button{
   margin:0px 5px;
+}
+.loading-screen{
+  background:rgba(0,0,0,0.5);
+  width:100%;
+  min-height:450px;
+  position:absolute;
+  z-index:9999;
 }
