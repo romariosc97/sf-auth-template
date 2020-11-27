@@ -75,6 +75,7 @@ export default function LoginView() {
                 </Field>
                 <Button.Group className="is-centered">
                   <Button loading={loginBtnStatus} disabled={loginBtnStatus} onClick={login} color="primary">LOGIN</Button>
+                  <a className="button is-info" href="http://localhost:8080/api/auth/oauth">OAUTH</a>
                 </Button.Group>
                 {redirectLogin}
               </div>

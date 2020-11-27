@@ -1,13 +1,13 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {Fragment} from 'react';
 import axios from 'axios';
-import { Redirect } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
+import MyPagination from './MyPagination';
 
 export default function MyTable(props) {
-  const deleteRecord = (accountId) => {
-    const accountAxios = axios.create({
+  const deleteRecord = (objectId) => {
+    const myAxios = axios.create({
       withCredentials: true,
     });
     Swal.queue([{
@@ -19,10 +19,10 @@ export default function MyTable(props) {
       showCancelButton: true,
       icon: 'warning',
       preConfirm: () => {
-          return accountAxios.delete(`http://localhost:8080/api/account/delete/${accountId}`, {accountId:accountId})
+          return myAxios.delete(`http://localhost:8080/api/${props.object}/delete/${objectId}`, {objectId:objectId})
           .then(data => {
-            let accounts_tmp = [];
-            props.setAccounts(accounts_tmp => accounts_tmp.filter((v, i) => v.Id !== accountId));
+            let data_tmp = [];
+            props.setData(data_tmp => data_tmp.filter((v, i) => v.Id !== objectId));
           })
           .catch((err) => {
               Swal.insertQueueStep({
@@ -55,7 +55,7 @@ export default function MyTable(props) {
                     })
                   }
                   <td className='table-actions'>
-                    <a href={"./edit-account/"+v.Id} className='button is-primary'><FontAwesomeIcon icon={faEdit} /></a>
+                    <a href={"./edit-"+props.object+"/"+v.Id} className='button is-primary'><FontAwesomeIcon icon={faEdit} /></a>
                     <button onClick={() => deleteRecord(v.Id)} className='button is-danger'><FontAwesomeIcon icon={faTrash} /></button>
                   </td>
                 </tr>
@@ -63,6 +63,9 @@ export default function MyTable(props) {
             }) : <tr><td className='has-text-centered' colSpan={props.fields.length+1}><div className='icon has-text-info my-spinner-c'><span className="my-spinner"></span></div></td></tr>}
           </tbody>
         </table>
+      </div>
+      <div className="columns">
+        <MyPagination></MyPagination>
       </div>
     </Fragment>
   )

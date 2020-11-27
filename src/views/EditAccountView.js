@@ -13,16 +13,49 @@ export default function EditAccountView() {
   const fields = ['Name', 'Type', 'Industry', 'Rating'];
   const fieldProperties = {
     'Name':{
-      'size': '3'
+      'size': '3',
+      'type': 'text'
     },
     'Type':{
-      'size': '3'
+      'size': '3',
+      'type': 'picklist',
+      'values':[
+        'Enterprise',
+        'Mid-Market',
+        'Small Business'
+      ]
     },
     'Industry':{
-      'size': '6'
+      'size': '6',
+      'type': 'picklist',
+      'values':[
+        'Agriculture',
+        'Apparel',
+        'Banking',
+        'Biotechnology',
+        'Chemicals',
+        'Communications',
+        'Construction',
+        'Consulting',
+        'Education',
+        'Electronics',
+        'Energy',
+        'Engineering',
+        'Entertainment',
+        'Enviromental',
+        'Food & Beverage',
+        'Government',
+        'Technology'
+      ]
     },
     'Rating':{
-      'size': '3'
+      'size': '3',
+      'type': 'picklist',
+      'values':[
+        'Hot',
+        'Warm',
+        'Cool'
+      ]
     }
   };
   const [value, setValue] = useState({

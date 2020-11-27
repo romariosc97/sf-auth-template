@@ -63,3 +63,6 @@ section.dashboard .card{
   position:absolute;
   z-index:9999;
 }
+div.select, div.select select{
+  width:100%;
+}

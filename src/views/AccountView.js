@@ -23,8 +23,15 @@ export default function AccountView() {
         <Container>
           <Card>
             <Card.Content>
-              <h2 className="title mb-4">List of Accounts</h2>
-              <MyTable setAccounts={setAccounts} data={accounts} fields={fields}></MyTable>
+              <div className="columns">
+                <div className="column is-9">
+                  <h2 className="title mb-4">List of Accounts</h2>
+                </div>
+                <div className="column is-3 has-text-right">
+                  <a href={"./create-account/"} className='button is-primary'>CREATE ACCOUNT</a>
+                </div>
+              </div>
+              <MyTable object="account" setData={setAccounts} data={accounts} fields={fields}></MyTable>
             </Card.Content>
           </Card>
         </Container>
