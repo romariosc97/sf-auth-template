@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import { Container, Card } from 'react-bulma-components';
 import { Redirect } from "react-router-dom";
 import MyNavbar from '../components/MyNavbar';
@@ -7,9 +7,10 @@ import axios from 'axios';
 
 export default function CreateAccountView() {
   const [redirectForm, setRedirectForm] = useState('');
-  const [submitBtnStatus, setSubmitBtnStatus] = useState(false);
+  const [submitBtnStatus, setSubmitBtnStatus] = useState(true);
   const fields = ['Name', 'Type', 'Industry', 'Rating'];
-  const fieldProperties = {
+  const [loadingScreen, setLoadingScreen] = useState(true);
+  const [fieldProperties, setFieldProperties] = useState({
     'Name':{
       'size': '3',
       'type': 'text'
@@ -18,44 +19,21 @@ export default function CreateAccountView() {
       'size': '3',
       'type': 'picklist',
       'values':[
-        'Enterprise',
-        'Mid-Market',
-        'Small Business'
       ]
     },
     'Industry':{
       'size': '3',
       'type': 'picklist',
       'values':[
-        'Agriculture',
-        'Apparel',
-        'Banking',
-        'Biotechnology',
-        'Chemicals',
-        'Communications',
-        'Construction',
-        'Consulting',
-        'Education',
-        'Electronics',
-        'Energy',
-        'Engineering',
-        'Entertainment',
-        'Enviromental',
-        'Food & Beverage',
-        'Government',
-        'Technology'
       ]
     },
     'Rating':{
       'size': '3',
       'type': 'picklist',
       'values':[
-        'Hot',
-        'Warm',
-        'Cool'
       ]
     }
-  };
+  });
   const [value, setValue] = useState({
     Name: "",
     Type: "",
@@ -68,28 +46,51 @@ export default function CreateAccountView() {
       [e.target.name]: e.target.value
     })
   };
-  const createAccount = () => {
-    const loginAxios = axios.create({
+  const createAccount = async () => {
+    const createAxios = axios.create({
       withCredentials: true,
     });
     setSubmitBtnStatus(true);
-    loginAxios.post(`http://localhost:8080/api/account/insert`, value)
-    .then(res => {
+    const result = await createAxios.post(`http://localhost:8080/api/account/insert`, value);
+    if(result.status===200){
       setRedirectForm(<Redirect to="/accounts" />);
-    })
-    .finally(() => {
       setSubmitBtnStatus(false);
-    })
+    }
   };
+
+  const getPicklists = async () => {
+    const result = await axios.get(
+      `http://localhost:8080/api/account/getPicklist`, 
+      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+    );
+    if(result.status===200){
+      let fieldPropertiesTmp = fieldProperties;
+      let valuesTmp;
+      for (let i = 0; i < result.data.length; i++) {
+        valuesTmp = [];
+        for (let iA = 0; iA < result.data[i].values.length; iA++) {
+          valuesTmp.push(result.data[i].values[iA].value)
+        }
+        fieldPropertiesTmp[result.data[i].name].values = valuesTmp;
+      }
+      setFieldProperties({...fieldProperties, fieldPropertiesTmp});
+      setLoadingScreen(false);
+      setSubmitBtnStatus(false);
+    }
+  };
+
+  useEffect(() => {
+    getPicklists();
+  }, []);
   return (
     <Fragment>
       <MyNavbar></MyNavbar>
       <section className="dashboard">
         <Container>
-          <Card>
+          <Card className="form">
             <Card.Content>
               <h2 className="title mb-4">Account's Form</h2>
-              <MyForm loadingScreen={false} submitBtnStatus={submitBtnStatus} value={value} onSubmitFunction={createAccount} updateInput={updateInput} fields={fields} fieldProperties={fieldProperties}></MyForm>
+              <MyForm loadingScreen={loadingScreen} submitBtnStatus={submitBtnStatus} value={value} onSubmitFunction={createAccount} updateInput={updateInput} fields={fields} fieldProperties={fieldProperties}></MyForm>
               {redirectForm}
             </Card.Content>
           </Card>

@@ -11,7 +11,7 @@ export default function EditAccountView() {
   const [loadingScreen, setLoadingScreen] = useState(true);
   let { accountId } = useParams();
   const fields = ['Name', 'Type', 'Industry', 'Rating'];
-  const fieldProperties = {
+  const [fieldProperties, setFieldProperties] = useState({
     'Name':{
       'size': '3',
       'type': 'text'
@@ -20,60 +20,65 @@ export default function EditAccountView() {
       'size': '3',
       'type': 'picklist',
       'values':[
-        'Enterprise',
-        'Mid-Market',
-        'Small Business'
       ]
     },
     'Industry':{
-      'size': '6',
+      'size': '3',
       'type': 'picklist',
       'values':[
-        'Agriculture',
-        'Apparel',
-        'Banking',
-        'Biotechnology',
-        'Chemicals',
-        'Communications',
-        'Construction',
-        'Consulting',
-        'Education',
-        'Electronics',
-        'Energy',
-        'Engineering',
-        'Entertainment',
-        'Enviromental',
-        'Food & Beverage',
-        'Government',
-        'Technology'
       ]
     },
     'Rating':{
       'size': '3',
       'type': 'picklist',
       'values':[
-        'Hot',
-        'Warm',
-        'Cool'
       ]
     }
-  };
+  });
   const [value, setValue] = useState({
     Name: "",
     Type: "",
     Industry: "",
     Rating: "",
   });
-  useEffect(() => {
-    axios.get(
+
+  const getPicklists = async () => {
+    const result = await axios.get(
+      `http://localhost:8080/api/account/getPicklist`, 
+      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+    );
+    if(result.status===200){
+      let fieldPropertiesTmp = fieldProperties;
+      let valuesTmp;
+      for (let i = 0; i < result.data.length; i++) {
+        valuesTmp = [];
+        for (let iA = 0; iA < result.data[i].values.length; iA++) {
+          valuesTmp.push(result.data[i].values[iA].value)
+        }
+        fieldPropertiesTmp[result.data[i].name].values = valuesTmp;
+      }
+      setFieldProperties({...fieldProperties, fieldPropertiesTmp});
+    }
+  };
+
+  const getData = async () => {
+    const result = await axios.get(
       `http://localhost:8080/api/account/get/${accountId}`, 
       {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    )
-    .then(res => {
-      setValue(res.data.records[0]);
+    );
+    if(result.status===200){
+      setValue(result.data.records[0]);
       setLoadingScreen(false);
       setSubmitBtnStatus(false);
-    })
+    }
+  };
+
+  useEffect(() => {
+    const asyncContext = async () => {
+      await getPicklists();
+      await getData();
+    };
+    asyncContext();
   }, []);
   const updateInput = (e) => {
     setValue({
@@ -81,25 +86,23 @@ export default function EditAccountView() {
       [e.target.name]: e.target.value
     })
   };
-  const updateAccount = () => {
-    const loginAxios = axios.create({
+  const updateAccount = async () => {
+    const updateAxios = axios.create({
       withCredentials: true,
     });
     setSubmitBtnStatus(true);
-    loginAxios.put(`http://localhost:8080/api/account/update`, value)
-    .then(res => {
+    const result = await updateAxios.put(`http://localhost:8080/api/account/update`, value);
+    if(result.status===200){
       setRedirectForm(<Redirect to="/accounts" />);
-    })
-    .finally(() => {
       setSubmitBtnStatus(false);
-    })
+    }
   };
   return (
     <Fragment>
       <MyNavbar></MyNavbar>
       <section className="dashboard">
         <Container>
-          <Card className="position-relative">
+          <Card className="form">
             <Card.Content>
               <h2 className="title mb-4">Account's Form</h2>
               <MyForm loadingScreen={loadingScreen} submitBtnStatus={submitBtnStatus} value={value} onSubmitFunction={updateAccount} updateInput={updateInput} fields={fields} fieldProperties={fieldProperties}></MyForm>

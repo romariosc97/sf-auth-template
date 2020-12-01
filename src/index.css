@@ -32,6 +32,9 @@ section.dashboard{
 section.dashboard .card{
   min-height: 450px;
 }
+section.dashboard .card.form{
+  min-height: 0px;
+}
 .my-spinner-c, .position-relative{
   position:relative;
 }
@@ -65,4 +68,8 @@ section.dashboard .card{
 }
 div.select, div.select select{
   width:100%;
+}
+.navbar-item[disabled], .navbar-item[disabled=true]{
+  pointer-events: none;
+  cursor:not-allowed;
 }

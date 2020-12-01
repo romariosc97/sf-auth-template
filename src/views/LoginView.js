@@ -13,33 +13,30 @@ export default function LoginView() {
   const [passwordHelp, setPasswordHelp] = useState('');
   const [redirectLogin, setRedirectLogin] = useState('');
   const [loginBtnStatus, setLoginBtnStatus] = useState(false);
-  const login = () => {
-    if(username==''){
+  const login = async (e) => {
+    if(username===''){
       setUsernameColor('danger');
       setUsernameHelp('No deje este campo en blanco.');
     }
-    if(password==''){
+    if(password===''){
       setPasswordColor('danger');
       setPasswordHelp('No deje este campo en blanco.');
     }
-    if(username!='' && password!=''){
+    if(username!=='' && password!==''){
       setLoginBtnStatus(true);
       setUsernameColor(null);
       setUsernameHelp('');
       setPasswordColor(null);
       setPasswordHelp('');
       const loginAxios = axios.create({
-        
         //timeout: 10000,
         withCredentials: true,
       });
-      loginAxios.post(`http://localhost:8080/api/auth/login`, {username:username, password:password})
-      .then(res => {
+      const result = await loginAxios.post(`http://localhost:8080/api/auth/login`, {username:username, password:password})
+      if(result.status===200){
         setRedirectLogin(<Redirect to="/dashboard" />);
-      })
-      .finally(() => {
         setLoginBtnStatus(false);
-      })
+      }
     } 
   };
   return (
@@ -51,14 +48,14 @@ export default function LoginView() {
               <div className="column is-10 is-offset-1 my-4">
                 <div className="has-text-centered">
                   <div>
-                    <img src="https://seeklogo.com/images/B/bulma-logo-45B5145BF4-seeklogo.com.png" width="30"/>
+                    <img src="https://seeklogo.com/images/B/bulma-logo-45B5145BF4-seeklogo.com.png" width="30" alt="Bulma"/>
                   </div>
                   <h2 className="title mb-4">Authentication</h2>
                 </div>
                 <Field>
                   <Control>
                     <Label>Email</Label>
-                    <Input color={usernameColor} type="text" value={username} name="username" onChange={(e) => {
+                    <Input onKeyUp={(e)=>{if(e.keyCode===13){login(e)}}} color={usernameColor} type="text" value={username} name="username" onChange={(e) => {
                       setUsername(e.target.value);
                     }} />
                     <Help color="danger">{usernameHelp}</Help>
@@ -67,7 +64,7 @@ export default function LoginView() {
                 <Field>
                   <Control>
                     <Label>Password</Label>
-                    <Input color={passwordColor} type="password" value={password} name="password" onChange={(e) => {
+                    <Input onKeyUp={(e)=>{if(e.keyCode===13){login(e)}}} color={passwordColor} type="password" value={password} name="password" onChange={(e) => {
                       setPassword(e.target.value);
                     }} />
                     <Help color="danger">{passwordHelp}</Help>

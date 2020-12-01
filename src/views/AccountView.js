@@ -7,14 +7,17 @@ import MyTable from '../components/MyTable';
 export default function AccountView() {
   const [accounts, setAccounts] = useState([]);
   const fields = ['Id', 'Name', 'Type', 'Industry', 'Rating'];
-  useEffect(() => {
-    axios.get(
+  const getAccounts = async () => {
+    const result = await axios.get(
       `http://localhost:8080/api/account/get`, 
       {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    )
-    .then(res => {
-      setAccounts(res.data.records);
-    })
+    );
+    if(result.status===200){
+      setAccounts(result.data.records); 
+    }
+  };
+  useEffect(() => {
+    getAccounts();
   }, []);
   return (
     <Fragment>

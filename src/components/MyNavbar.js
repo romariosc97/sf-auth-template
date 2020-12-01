@@ -6,29 +6,35 @@ import { Redirect } from "react-router-dom";
 export default function MyNavbar() {
   const [checkSession, setCheckSession] = useState('');
   const [salesforceUser, setSalesforceUser] = useState({});
-  useEffect(() => {
-    axios.get(
+  const [logoutStatus, setLogoutStatus] = useState(false);
+  const getSession = async () => {
+    const result = await axios.get(
       `http://localhost:8080/api/auth/session`, 
       {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    )
-    .then(res => {
-      setSalesforceUser(res.data.salesforce.user);
-    })
+    );
+    if(result.status===200){
+      setSalesforceUser(result.data.salesforce.user);
+    }
+  };
+  useEffect(() => {
+    getSession();
   }, []);
-  const logout = () => {
-    axios.get(
+  const logout = async () => {
+    setLogoutStatus(true);
+    const result = await axios.get(
       `http://localhost:8080/api/auth/revoke`, 
       {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    )
-    .then(res => {
+    );
+    if(result.status===200){
       setCheckSession(<Redirect to="/" />);
-    })
+      setLogoutStatus(false);
+    }
   };
   return (
     <Navbar>
       <Navbar.Brand>
         <Navbar.Item href="/dashboard">
-          <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28"/>
+          <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28" alt="Bulma"/>
         </Navbar.Item>
       </Navbar.Brand>
       <Navbar.Menu>
@@ -45,7 +51,7 @@ export default function MyNavbar() {
             {salesforceUser.name}
           </Navbar.Link>
           <Navbar.Dropdown>
-            <Navbar.Item onClick={logout}>
+            <Navbar.Item onClick={logout} disabled={logoutStatus}>
               Logout
             </Navbar.Item>
             {checkSession}
