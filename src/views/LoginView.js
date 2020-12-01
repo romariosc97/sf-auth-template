@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Button, Form, Card } from 'react-bulma-components';
+import { Button, Form, Card, Notification } from 'react-bulma-components';
 import { Redirect } from "react-router-dom";
 import axios from 'axios';
 const { Input, Field, Control, Label, Help } = Form;
@@ -13,7 +13,9 @@ export default function LoginView() {
   const [passwordHelp, setPasswordHelp] = useState('');
   const [redirectLogin, setRedirectLogin] = useState('');
   const [loginBtnStatus, setLoginBtnStatus] = useState(false);
-  const login = async (e) => {
+  const [notificationStatus, setNotificationStatus] = useState(false);
+  const [notificationText, setNotificationText] = useState('');
+  const validateFields = () => {
     if(username===''){
       setUsernameColor('danger');
       setUsernameHelp('No deje este campo en blanco.');
@@ -22,25 +24,43 @@ export default function LoginView() {
       setPasswordColor('danger');
       setPasswordHelp('No deje este campo en blanco.');
     }
+  };
+  const restartFields = () => {
+    setLoginBtnStatus(true);
+    setUsernameColor(null);
+    setUsernameHelp('');
+    setPasswordColor(null);
+    setPasswordHelp('');
+  };
+  const login = async (e) => {
+    validateFields();
     if(username!=='' && password!==''){
-      setLoginBtnStatus(true);
-      setUsernameColor(null);
-      setUsernameHelp('');
-      setPasswordColor(null);
-      setPasswordHelp('');
+      restartFields();
       const loginAxios = axios.create({
-        //timeout: 10000,
         withCredentials: true,
       });
-      const result = await loginAxios.post(`http://localhost:8080/api/auth/login`, {username:username, password:password})
-      if(result.status===200){
+      try {
+        await loginAxios.post(`http://localhost:8080/api/auth/login`, {username:username, password:password}, {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}});
         setRedirectLogin(<Redirect to="/dashboard" />);
+      } catch (error) {
+        setNotificationStatus(true);
+        setNotificationText(error.message);
         setLoginBtnStatus(false);
+        setTimeout(
+          () =>{
+            setNotificationStatus(false);
+            //setNotificationText('');
+          }, 
+          3000
+        );
       }
     } 
   };
+
   return (
     <section className="login">
+      {/*notificationStatus===true ? <Notification className="notification-fixed is-light" color="warning">{notificationText}</Notification> : ''*/}
+      {<Notification className={"notification-fixed is-light"+(notificationStatus===true ? " active" : '')} color="danger"><b>{notificationText}</b></Notification>}
       <div className="columns is-mobile is-vcentered">
         <div className="column is-4 is-offset-4">
         <Card>
@@ -72,7 +92,8 @@ export default function LoginView() {
                 </Field>
                 <Button.Group className="is-centered">
                   <Button loading={loginBtnStatus} disabled={loginBtnStatus} onClick={login} color="primary">LOGIN</Button>
-                  <a className="button is-info" href="http://localhost:8080/api/auth/oauth">OAUTH</a>
+                  {/*<Button loading={loginBtnStatus} disabled={loginBtnStatus} onClick={loginOauth} color="primary">OAUTH REQUEST</Button>*/}
+                  <Button renderAs="a" loading={loginBtnStatus} disabled={loginBtnStatus} onClick={()=>{setLoginBtnStatus(true)}} className="button is-info" href="http://localhost:8080/api/auth/oauth">OAUTH</Button>
                 </Button.Group>
                 {redirectLogin}
               </div>

@@ -2,32 +2,44 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Navbar } from 'react-bulma-components';
 import { Redirect } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 export default function MyNavbar() {
   const [checkSession, setCheckSession] = useState('');
   const [salesforceUser, setSalesforceUser] = useState({});
   const [logoutStatus, setLogoutStatus] = useState(false);
-  const getSession = async () => {
-    const result = await axios.get(
-      `http://localhost:8080/api/auth/session`, 
-      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    );
-    if(result.status===200){
-      setSalesforceUser(result.data.salesforce.user);
-    }
-  };
   useEffect(() => {
+    let unmounted = false;
+    const getSession = async () => {
+      if(!unmounted){
+        try {
+          const result = await axios.get(
+            `http://localhost:8080/api/auth/session`, 
+            {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+          );
+          setSalesforceUser(result.data.salesforce.user);
+        } catch (error) {
+          setCheckSession(<Redirect to="/" />);
+        }
+      }
+    };
     getSession();
+    return () => {
+      unmounted = true
+    }
   }, []);
   const logout = async () => {
     setLogoutStatus(true);
-    const result = await axios.get(
-      `http://localhost:8080/api/auth/revoke`, 
-      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    );
-    if(result.status===200){
+    try {
+      await axios.get(
+        `http://localhost:8080/api/auth/revoke`, 
+        {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+      );
       setCheckSession(<Redirect to="/" />);
-      setLogoutStatus(false);
+      setLogoutStatus(false); 
+    } catch (error) {
+      
     }
   };
   return (
@@ -52,7 +64,8 @@ export default function MyNavbar() {
           </Navbar.Link>
           <Navbar.Dropdown>
             <Navbar.Item onClick={logout} disabled={logoutStatus}>
-              Logout
+              <span>Logout</span>
+              {logoutStatus===true ? <FontAwesomeIcon className="ml-2" pulse icon={faSpinner} /> : ''}
             </Navbar.Item>
             {checkSession}
           </Navbar.Dropdown>

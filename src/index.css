@@ -72,4 +72,23 @@ div.select, div.select select{
 .navbar-item[disabled], .navbar-item[disabled=true]{
   pointer-events: none;
   cursor:not-allowed;
+  color:#777;
+}
+.ml-2{
+  margin-left: 0.5em;
+}
+.notification-fixed{
+  position:fixed!important;
+  z-index: 999;
+  top:60px;
+  right:0;
+  left:0;
+  margin:auto;
+  width:300px;
+  font-size:14px;
+  transition: opacity .45s ease-in-out!important;
+  opacity:0;
+}
+.notification-fixed.active{
+  opacity:1;
 }

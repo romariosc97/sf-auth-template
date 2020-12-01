@@ -1,11 +1,14 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useState} from 'react';
 import axios from 'axios';
+import { Notification } from 'react-bulma-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import MyPagination from './MyPagination';
 
 export default function MyTable(props) {
+  const [notificationStatus, setNotificationStatus] = useState(false);
+  const [notificationText, setNotificationText] = useState('');
   const deleteRecord = (objectId) => {
     const myAxios = axios.create({
       withCredentials: true,
@@ -13,7 +16,7 @@ export default function MyTable(props) {
     Swal.queue([{
       title: 'Are you sure?',
       confirmButtonColor: '#dc3545',
-      confirmButtonText: 'Confirmar',
+      confirmButtonText: 'Confirm',
       text:"You won't be able to revert this!",
       showLoaderOnConfirm: true,
       showCancelButton: true,
@@ -23,6 +26,15 @@ export default function MyTable(props) {
           .then(data => {
             let data_tmp = [];
             props.setData(data_tmp => data_tmp.filter((v, i) => v.Id !== objectId));
+            setNotificationStatus(true);
+            setNotificationText('Deleted successfully!');
+            setTimeout(
+              () =>{
+                setNotificationStatus(false);
+                //setNotificationText('');
+              }, 
+              3000
+            );
           })
           .catch((err) => {
               Swal.insertQueueStep({
@@ -35,6 +47,7 @@ export default function MyTable(props) {
   };
   return (
     <Fragment>
+      {<Notification className={"notification-fixed is-light"+(notificationStatus===true ? " active" : '')} color="success"><b>{notificationText}</b></Notification>}
       <div className="table-container">
         <table className="table is-bordered is-fullwidth">
           <thead>
