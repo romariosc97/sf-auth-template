@@ -46,7 +46,7 @@ export default function MyForm(props) {
                 <div className="columns">
                     <div className="column is-12">
                         <Button.Group className="is-centered">
-                            <Button type="submit" loading={props.submitBtnStatus} disabled={props.submitBtnStatus} color="primary">SEND</Button>
+                            <Button type="submit" loading={props.submitBtnStatus} disabled={props.submitBtnStatus} color="link">SEND</Button>
                             <Button type="button" onClick={() => history.goBack()} color="light">GO BACK</Button>
                         </Button.Group>
                     </div>

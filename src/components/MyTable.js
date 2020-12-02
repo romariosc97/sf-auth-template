@@ -68,7 +68,7 @@ export default function MyTable(props) {
                     })
                   }
                   <td className='table-actions'>
-                    <a href={"./edit-"+props.object+"/"+v.Id} className='button is-primary'><FontAwesomeIcon icon={faEdit} /></a>
+                    <a href={"./edit-"+props.object+"/"+v.Id} className='button is-link'><FontAwesomeIcon icon={faEdit} /></a>
                     <button onClick={() => deleteRecord(v.Id)} className='button is-danger'><FontAwesomeIcon icon={faTrash} /></button>
                   </td>
                 </tr>

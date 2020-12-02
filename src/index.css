@@ -15,7 +15,7 @@ section.login{
   background-color:#fbf6f0;
 }
 section.login .is-vcentered{
-  height:100vh;
+  height:103vh;
 }
 .mb-4{
   margin-bottom: 1rem;
@@ -79,10 +79,9 @@ div.select, div.select select{
 }
 .notification-fixed{
   position:fixed!important;
-  z-index: 999;
   top:60px;
-  right:0;
-  left:0;
+  right:20px;
+  /*left:0;*/
   margin:auto;
   width:300px;
   font-size:14px;
@@ -91,4 +90,5 @@ div.select, div.select select{
 }
 .notification-fixed.active{
   opacity:1;
+  z-index: 999;
 }

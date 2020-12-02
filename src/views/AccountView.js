@@ -7,17 +7,25 @@ import MyTable from '../components/MyTable';
 export default function AccountView() {
   const [accounts, setAccounts] = useState([]);
   const fields = ['Id', 'Name', 'Type', 'Industry', 'Rating'];
-  const getAccounts = async () => {
-    const result = await axios.get(
-      `http://localhost:8080/api/account/get`, 
-      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    );
-    if(result.status===200){
-      setAccounts(result.data.records); 
-    }
-  };
   useEffect(() => {
+    let unmounted = false;
+    const getAccounts = async () => {
+      try {
+        const result = await axios.get(
+          `http://localhost:8080/api/account/get`, 
+          {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+        );
+        if(!unmounted){
+          setAccounts(result.data.records); 
+        }
+      } catch (error) {
+        console.error(error.message)
+      }
+    };
     getAccounts();
+    return () => {
+      unmounted = true
+    }
   }, []);
   return (
     <Fragment>
@@ -31,7 +39,7 @@ export default function AccountView() {
                   <h2 className="title mb-4">List of Accounts</h2>
                 </div>
                 <div className="column is-3 has-text-right">
-                  <a href={"./create-account/"} className='button is-primary'>CREATE ACCOUNT</a>
+                  <a href={"./create-account/"} className='button is-link'>CREATE ACCOUNT</a>
                 </div>
               </div>
               <MyTable object="account" setData={setAccounts} data={accounts} fields={fields}></MyTable>

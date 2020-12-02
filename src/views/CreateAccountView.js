@@ -51,19 +51,21 @@ export default function CreateAccountView() {
       withCredentials: true,
     });
     setSubmitBtnStatus(true);
-    const result = await createAxios.post(`http://localhost:8080/api/account/insert`, value);
-    if(result.status===200){
+    try {
+      await createAxios.post(`http://localhost:8080/api/account/insert`, value);
       setRedirectForm(<Redirect to="/accounts" />);
+    } catch (error) {
       setSubmitBtnStatus(false);
     }
+    
   };
 
   const getPicklists = async () => {
-    const result = await axios.get(
-      `http://localhost:8080/api/account/getPicklist`, 
-      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    );
-    if(result.status===200){
+    try {
+      const result = await axios.get(
+        `http://localhost:8080/api/account/getPicklist`, 
+        {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+      );
       let fieldPropertiesTmp = fieldProperties;
       let valuesTmp;
       for (let i = 0; i < result.data.length; i++) {
@@ -76,6 +78,8 @@ export default function CreateAccountView() {
       setFieldProperties({...fieldProperties, fieldPropertiesTmp});
       setLoadingScreen(false);
       setSubmitBtnStatus(false);
+    } catch (error) {
+      console.error(error.message);
     }
   };
 

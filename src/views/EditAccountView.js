@@ -42,38 +42,36 @@ export default function EditAccountView() {
     Rating: "",
   });
 
-  const getPicklists = async () => {
-    const result = await axios.get(
-      `http://localhost:8080/api/account/getPicklist`, 
-      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    );
-    if(result.status===200){
-      let fieldPropertiesTmp = fieldProperties;
-      let valuesTmp;
-      for (let i = 0; i < result.data.length; i++) {
-        valuesTmp = [];
-        for (let iA = 0; iA < result.data[i].values.length; iA++) {
-          valuesTmp.push(result.data[i].values[iA].value)
-        }
-        fieldPropertiesTmp[result.data[i].name].values = valuesTmp;
-      }
-      setFieldProperties({...fieldProperties, fieldPropertiesTmp});
-    }
-  };
-
-  const getData = async () => {
-    const result = await axios.get(
-      `http://localhost:8080/api/account/get/${accountId}`, 
-      {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
-    );
-    if(result.status===200){
-      setValue(result.data.records[0]);
-      setLoadingScreen(false);
-      setSubmitBtnStatus(false);
-    }
-  };
-
   useEffect(() => {
+    const getData = async () => {
+      const result = await axios.get(
+        `http://localhost:8080/api/account/get/${accountId}`, 
+        {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+      );
+      if(result.status===200){
+        setValue(result.data.records[0]);
+        setLoadingScreen(false);
+        setSubmitBtnStatus(false);
+      }
+    };
+    const getPicklists = async () => {
+      const result = await axios.get(
+        `http://localhost:8080/api/account/getPicklist`, 
+        {headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}, "withCredentials": true}
+      );
+      if(result.status===200){
+        let fieldPropertiesTmp = fieldProperties;
+        let valuesTmp;
+        for (let i = 0; i < result.data.length; i++) {
+          valuesTmp = [];
+          for (let iA = 0; iA < result.data[i].values.length; iA++) {
+            valuesTmp.push(result.data[i].values[iA].value)
+          }
+          fieldPropertiesTmp[result.data[i].name].values = valuesTmp;
+        }
+        setFieldProperties({...fieldProperties, fieldPropertiesTmp});
+      }
+    };
     const asyncContext = async () => {
       await getPicklists();
       await getData();
@@ -91,9 +89,10 @@ export default function EditAccountView() {
       withCredentials: true,
     });
     setSubmitBtnStatus(true);
-    const result = await updateAxios.put(`http://localhost:8080/api/account/update`, value);
-    if(result.status===200){
+    try {
+      await updateAxios.put(`http://localhost:8080/api/account/update`, value);
       setRedirectForm(<Redirect to="/accounts" />);
+    } catch (error) {
       setSubmitBtnStatus(false);
     }
   };
